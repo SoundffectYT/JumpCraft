@@ -3,20 +3,39 @@ scene.onHitWall(SpriteKind.Player, function (sprite, location) {
         if (first_touch) {
             tiles.setCurrentTilemap(tilemap`level2`)
             mySprite.setPosition(7, 50)
+            mySprite2.destroy()
         }
     }
+})
+scene.onOverlapTile(SpriteKind.Player, sprites.dungeon.stairNorth, function (sprite, location) {
+    if (first_touch) {
+        tiles.setCurrentTilemap(tilemap`level6`)
+        mySprite.setPosition(13, 48)
+    }
+})
+controller.B.onEvent(ControllerButtonEvent.Pressed, function () {
+    tiles.setTilemap(tilemap`level1`)
+    mySprite.setPosition(6, 28)
 })
 controller.A.onEvent(ControllerButtonEvent.Pressed, function () {
     first_touch = true
     mySprite.vy = -150
 })
-scene.onOverlapTile(SpriteKind.Player, sprites.dungeon.floorLight5, function (sprite2, location2) {
+scene.onOverlapTile(SpriteKind.Player, sprites.builtin.oceanDepths1, function (sprite, location) {
+    game.over(false, effects.dissolve)
+})
+scene.onOverlapTile(SpriteKind.Player, sprites.dungeon.purpleOuterSouth1, function (sprite2, location2) {
     if (first_touch) {
         game.over(true, effects.confetti)
     }
 })
-let projectile: Sprite = null
+sprites.onOverlap(SpriteKind.Player, SpriteKind.Enemy, function (sprite, otherSprite) {
+    mySprite.startEffect(effects.trail)
+    info.changeLifeBy(-1)
+    game.over(false, effects.dissolve)
+})
 let first_touch = false
+let mySprite2: Sprite = null
 let mySprite: Sprite = null
 mySprite = sprites.create(img`
     . . . . . . f f f f . . . . . . 
@@ -36,7 +55,7 @@ mySprite = sprites.create(img`
     . . . . . . f d d f . . . . . . 
     . . . . . f d d d d f . . . . . 
     `, SpriteKind.Player)
-let mySprite2 = sprites.create(img`
+mySprite2 = sprites.create(img`
     . . . . . f f f f f . . . . . . 
     . . . . f c c 1 c c f . . . . . 
     . . . . f 1 f c c c c f . . . . 
@@ -53,11 +72,10 @@ let mySprite2 = sprites.create(img`
     . . f 1 1 f . . . . . . . . . . 
     . f 1 1 1 1 f . . . . . . . . . 
     f 1 1 . . 1 1 f . . . . . . . . 
-    `, SpriteKind.Player)
-mySprite2.setPosition(70, 40)
+    `, SpriteKind.Enemy)
+mySprite2.setPosition(74, 30)
 mySprite.ay = 300
 controller.moveSprite(mySprite, 100, 0)
-tiles.setTilemap(tilemap`level1`)
 first_touch = true
 scene.cameraFollowSprite(mySprite)
 scene.setBackgroundImage(img`
@@ -183,32 +201,11 @@ scene.setBackgroundImage(img`
     1111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111
     `)
 mySprite.setPosition(7, 40)
-for (let index = 0; index < 10000; index++) {
-    music.playMelody("A G B B E D G C5 ", 120)
-}
-info.setLife(3)
-if (projectile) {
-    info.changeLifeBy(-1)
-}
-mySprite2.follow(mySprite, 50)
-game.onUpdateInterval(5000, function () {
-    projectile = sprites.createProjectileFromSprite(img`
-        . . . . . . . . . . . . . . . . 
-        . . . . . . . . . . . . . . . . 
-        . . . . . . . . . . . . . . . . 
-        . . . . . . . . . . . . . . . . 
-        . . . . . . . . . . . . . . . . 
-        . . . . 5 . . . . . . . . . . . 
-        . . . 5 5 . . . . . . . . . . . 
-        . . 2 5 5 e e e e e e . . . . . 
-        . . . 5 5 . . . . . . . . . . . 
-        . . . . 5 . . . . . . . . . . . 
-        . . . . . . . . . . . . . . . . 
-        . . . . . . . . . . . . . . . . 
-        . . . . . . . . . . . . . . . . 
-        . . . . . . . . . . . . . . . . 
-        . . . . . . . . . . . . . . . . 
-        . . . . . . . . . . . . . . . . 
-        `, mySprite2, 50, 0)
-    projectile.setVelocity(50, 0)
+info.setLife(1)
+tiles.setCurrentTilemap(tilemap`level7`)
+game.showLongText("WELCOME TO JUMPCRAFT!", DialogLayout.Bottom)
+game.showLongText("PRESS B TO START", DialogLayout.Bottom)
+game.showLongText("PRESS B IF YOU WANT TO RESPAWN AT THE START!", DialogLayout.Bottom)
+forever(function () {
+    music.playMelody("C5 B F D F G A B ", 120)
 })
